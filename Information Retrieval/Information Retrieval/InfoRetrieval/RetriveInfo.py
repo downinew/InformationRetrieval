@@ -13,7 +13,7 @@ def main():
     BM25 = [("noname",100)]
     PhaseExtensionTopTen = []
     NGRAM = []
-    array = ["lincoln"]
+    array = ["great","president"]
     
     rootDir = 'Presidents'
     for dirPath, dirNames, fileNames in os.walk(rootDir):
@@ -91,9 +91,9 @@ def Top10(topTenArray):
 def nGram(D,array):
     n = len(array)
     index = 0
-    count = 0
     nGramCheck = 0
     while(index + n <= len(D)):
+        count = 0
         for query in array:
             for i in range(index, index+n):
                 if D[i] == query:
@@ -101,7 +101,12 @@ def nGram(D,array):
         if count == n:
             nGramCheck += 1
         index += 1
+    print(nGramCheck)
     return nGramCheck
-                
+
+
+
+
+
 if __name__ == '__main__':
     main()
