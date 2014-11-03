@@ -7,12 +7,13 @@ Created on Nov 2, 2014
 import os
 import math
 from cgi import log
+from string import lowercase
 
 def main():
     BM25 = [("noname",100)]
     PhaseExtensionTopTen = []
     NGRAM = []
-    array = ["franklin"]
+    array = ["lincoln"]
     
     rootDir = 'Presidents'
     for dirPath, dirNames, fileNames in os.walk(rootDir):
@@ -52,7 +53,7 @@ def IDFNumber(query):
     for dirPath, dirNames, fileNames in os.walk(rootDir):
         for file in fileNames:
             f = open('Presidents/' + file,'r')
-            contents = f.read().lower().split()
+            contents = f.read().split()
             for word in contents:
                 if word == query:
                     count += 1
@@ -60,8 +61,8 @@ def IDFNumber(query):
     top = (43 - count + .5)
     bottom = (count + .5)
     number = top / bottom
-    if number < 0:
-        number = number + 10
+    if(number< 0):
+        number += 10
     IDFscore = math.log(number)
     return IDFscore
 
@@ -97,16 +98,10 @@ def nGram(D,array):
             for i in range(index, index+n):
                 if D[i] == query:
                     count += 1
-        if count % n == 0:
+        if count == n:
             nGramCheck += 1
         index += 1
     return nGramCheck
                 
-    
-    
-
-
-
-
 if __name__ == '__main__':
     main()
