@@ -8,12 +8,13 @@ import os
 import math
 from cgi import log
 from string import lowercase
+from audioop import reverse
 
 def main():
     BM25 = [("noname",100)]
-    PhaseExtensionTopTen = []
+    textAlign = []
     NGRAM = []
-    array = ["great","president"]
+    array = ["assassinated","president"]
     
     rootDir = 'Presidents'
     for dirPath, dirNames, fileNames in os.walk(rootDir):
@@ -21,17 +22,25 @@ def main():
             f = open('Presidents/' + file,'r')
             D = f.read().lower().split()
             bm25Score = BM25ScoringFunction(D, array)
-            nGramScore = nGram(D, array)
-            NGRAM.insert(0, (nGramScore,file))
+            nGramScore = nGram(D, array, 5)
+            textAlignScore = TextualAlignment(D, array)
+            if textAlignScore > 0:
+                textAlign.insert(0, (textAlignScore,file))
+            if nGramScore > 0:
+                NGRAM.insert(0, (nGramScore,file))
             BM25.insert(0, (bm25Score,file))
             f.close()
-            
+    textAlign.sort(reverse=True)
     BM25.sort()
     NGRAM.sort(cmp=None, key=None, reverse=True)
-    NGRAM = Top10(NGRAM)
     BM25 = Top10(BM25)
+    if len(NGRAM) > 10:
+        NGRAM = Top10(NGRAM)
+    if len(textAlign) > 10:
+        textAlign = Top10(textAlign)
     print(BM25)
     print(NGRAM)
+    print(textAlign)
         
 def BM25ScoringFunction(D, Q):
     score = 0
@@ -88,8 +97,7 @@ def Top10(topTenArray):
     return topTenArray
 
 
-def nGram(D,array):
-    n = len(array)
+def nGram(D,array,n):
     index = 0
     nGramCheck = 0
     while(index + n <= len(D)):
@@ -98,14 +106,24 @@ def nGram(D,array):
             for i in range(index, index+n):
                 if D[i] == query:
                     count += 1
-        if count == n:
+        if count == len(array):
             nGramCheck += 1
         index += 1
-    print(nGramCheck)
     return nGramCheck
 
-
-
+def TextualAlignment(D, array):
+    index = 0
+    textCheck = len(array)
+    score = 0
+    while(index + textCheck <= len(D)):
+        matches = 0
+        for i in range(index, index + textCheck):
+            for query in array:
+                if D[i] == query:
+                    matches += 1
+        score += matches * .75
+        index += 1
+    return score
 
 
 if __name__ == '__main__':
